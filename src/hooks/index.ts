@@ -4,3 +4,5 @@ export { useTheme } from './useTheme';
 export { useWindowSize } from './useWindowSize';
 export { usePreloadImages } from './usePreloadImages';
 export { useGSAPTimeline } from './useGSAPTimeline';
+export { use3DScroll } from './use3DScroll';
+export { useReducedMotion } from './useReducedMotion';

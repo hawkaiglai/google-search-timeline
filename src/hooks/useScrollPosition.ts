@@ -1,57 +1,44 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { throttle, getScrollProgress, getMaxScroll, getScrollDirection } from '@/lib/utils/scrollHelpers';
-import type { ScrollPosition } from '@/types';
+import { useEffect } from 'react';
+import { useScrollStore } from '@/store/scrollStore';
 
-interface UseScrollPositionOptions {
-  throttleMs?: number;
-  onScroll?: (position: ScrollPosition) => void;
-}
-
-export function useScrollPosition(options: UseScrollPositionOptions = {}) {
-  const { throttleMs = 16, onScroll } = options;
-  
-  const [scrollPosition, setScrollPosition] = useState<ScrollPosition>({
-    scrollY: 0,
-    scrollProgress: 0,
-    currentYear: 1996,
-    direction: 'none',
-  });
-
-  const [prevScrollY, setPrevScrollY] = useState(0);
-
-  const handleScroll = useCallback(() => {
-    const scrollY = window.scrollY;
-    const maxScroll = getMaxScroll();
-    const scrollProgress = getScrollProgress(scrollY, maxScroll);
-    const direction = getScrollDirection(scrollY, prevScrollY);
-    
-    const position: ScrollPosition = {
-      scrollY,
-      scrollProgress,
-      currentYear: Math.round(1996 + scrollProgress * (2025 - 1996)),
-      direction,
-    };
-
-    setScrollPosition(position);
-    setPrevScrollY(scrollY);
-    
-    if (onScroll) {
-      onScroll(position);
-    }
-  }, [prevScrollY, onScroll]);
-
+export function useScrollPosition() {
   useEffect(() => {
-    const throttledScroll = throttle(handleScroll, throttleMs);
-    
-    window.addEventListener('scroll', throttledScroll, { passive: true });
-    handleScroll();
+    let ticking = false;
+    let lastScrollY = 0;
 
-    return () => {
-      window.removeEventListener('scroll', throttledScroll);
+    const updateScroll = () => {
+      const scrollY = window.scrollY;
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = maxScroll > 0 ? scrollY / maxScroll : 0;
+
+      const direction = scrollY > lastScrollY ? 'down' : scrollY < lastScrollY ? 'up' : 'idle';
+      lastScrollY = scrollY;
+
+      useScrollStore.getState().setProgress(progress);
+      useScrollStore.getState().setDirection(direction);
+      useScrollStore.getState().setScrollY(scrollY);
+
+      ticking = false;
     };
-  }, [handleScroll, throttleMs]);
 
-  return scrollPosition;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateScroll);
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    updateScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return useScrollStore((state) => ({
+    progress: state.progress,
+    direction: state.direction,
+    scrollY: state.scrollY,
+  }));
 }
