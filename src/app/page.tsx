@@ -1,5 +1,6 @@
 'use client';
 
+import type { Milestone } from '@/types';
 import React, { useEffect } from 'react';
 import { Header, Footer } from '@/components/layout';
 import { HeroSection, TimelineSection, AboutSection } from '@/components/sections';
@@ -14,7 +15,7 @@ export default function HomePage() {
     const loadData = async () => {
       setLoading(true);
       try {
-        setMilestones(timelineData.milestones);
+        setMilestones(timelineData.milestones as Milestone[]);
       } catch (error) {
         console.error('Failed to load timeline data:', error);
       } finally {

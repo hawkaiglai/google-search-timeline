@@ -10,10 +10,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: '#4285F4',
-        secondary: '#34A853',
-        accent: '#FBBC04',
-        danger: '#EA4335',
+        border: 'hsl(var(--border))',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        primary: 'hsl(var(--primary))',
+        secondary: 'hsl(var(--secondary))',
+        accent: 'hsl(var(--accent))',
+        muted: 'hsl(var(--muted))',
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
