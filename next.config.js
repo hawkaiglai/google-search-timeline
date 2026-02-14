@@ -5,6 +5,7 @@ const nextConfig = {
   images: {
     domains: ['images.unsplash.com', 'via.placeholder.com'],
     formats: ['image/avif', 'image/webp'],
+    unoptimized: true,
   },
   webpack: (config) => {
     config.module.rules.push({
@@ -16,9 +17,6 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['@react-three/fiber', '@react-three/drei', 'three'],
   },
-  output: 'export',
-  basePath: '',
-  trailingSlash: true,
 };
 
 module.exports = nextConfig;
